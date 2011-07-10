@@ -18,7 +18,7 @@ name: CLI-Startup
 provides:
   CLI::Startup:
     file: lib/CLI/Startup.pm
-    version: 0.02
+    version: 0.03
 requires:
   Class::Std: 0.01
   Clone: 0
@@ -32,4 +32,4 @@ requires:
   perl: v5.8.8
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.02
+version: 0.03

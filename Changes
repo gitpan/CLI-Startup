@@ -1,5 +1,7 @@
 Revision history for CLI-Startup
 
+0.03    2011-07-09
+        Fix documentation and one failed test.
 0.02    2011-07-08
         First feature-complete version.
 0.01    2011-07-04

@@ -24,13 +24,13 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Good command-line scripts always support command-line options using
 Getopt::Long, and I<should> support default configuration in a .rc
@@ -60,7 +60,7 @@ and to specify default options. It slightly enhances C<Getopt::Long>
 behavior by allowing repeatable options to be specified I<either>
 with multiple options I<or> with a commalist honoring CSV quoting
 conventions. It also enhances C<Config::Simple> behavior by supporting
-options with hashes as values, and by un-flattening the contents
+options with hashes as values, and by unflattening the contents
 of INI files into a two-level hash.
 
 For convenience, C<CLI::Support> also supplies C<die()> and C<warn()>
@@ -82,27 +82,113 @@ methods that prepend the name of the script and postpend a newline.
     # Process the command line and resource file (if any)
     $app->init;
 
-    # Handle program options, which might have come from the
-    # command line, or might have come from the resource file:
-    my %opts    = $app->get_options;
-    my $opts    = $app->get_options;            # Can return hash or hashref
-    my $verbose = $app->get_options('verbose'); # Can look up individual opts
-    my @email   = $app->get_options('email');   # Can return array or arrayref
-    ...
+    # Information about the current invocation of the calling
+    # script:
+    my $opts = $app->get_raw_options;       # Actual command-line options
+    my $conf = $app->get_config;            # Options set in config file
+    my $dflt = $app->get_default_settings;  # Wired-in script defaults
+
+    # Get the applicable options for the current invocation of
+    # the script by combining, in order of decreasing precedence:
+    # the actual command-line options; the options set in the
+    # config file; and any wired-in script defaults.
+    my $opts = $app->get_options;
 
     # Print messages to the user, with helpful formatting
-    $app->die_usage();   # Print the --help message and exit
-    $app->warn();        # Format warnings nicely
-    $app->die();         # Die with a nicely-formatted message
+    $app->die_usage();      # Print a --help message and exit
+    $app->print_manpage();  # Print the formatted POD for this script and exit
+    $app->print_version();  # Print version information for the calling script
+    $app->warn();           # Format warnings nicely
+    $app->die();            # Die with a nicely-formatted message
+
+=head1 EXAMPLES
+
+The following is a complete implementation of a wrapper for C<rsync>.
+Since C<rsync> doesn't support a config file, this wrapper provides
+that feature in 33 lines of code (according to C<sloccount>). Fully
+1/3 of the file is simply a list of the rsync command-line options
+in the definition of C<$optspec>; the rest is just a small amount
+of glue for invoking C<rsync> with the requested options.
+
+  #!/usr/bin/perl
+
+  use File::Rsync;
+  use CLI::Startup;
+  use List::Util qw{ reduce };
+  use Hash::Merge qw{ merge };
+
+  # All the rsync command-line options
+  $optspec = {
+      'archive!'     => 'Use archive mode--see manpage for rsync',
+      ...
+      'verbose+'     => 'Increase rsync verbosity',
+  };
+
+  # Default settings
+  $defaults = {
+      archive  => 1,
+      compress => 1,
+      rsh      => 'ssh',
+  };
+
+  # Parse command line and read config
+  $app = CLI::Startup->new({
+      usage            => '[options] [module ...]',
+      options          => $optspec,
+      default_settings => $defaults,
+  });
+  $app->init;
+
+  # Now @ARGV is a list of INI-file groups: run rsync for
+  # each one in turn.
+  do {
+      # Combine the following, in this order of precedence:
+      # 1) The actual command-line options
+      # 2) The INI-file group requested in $ARGV[0]
+      # 3) The INI-file [default] group
+      # 4) The wired-in app defaults
+
+      $options = reduce { merge($a, $b) } (
+          $app->get_raw_options,
+          $config->{shift @ARGV} || {},
+          $app->get_config->{default},
+          $defaults,
+      );
+
+      my $rsync = File::Rsync->new($options);
+
+      $rsync->exec({
+          src    => delete $options->{src},
+          dest   => delete $options->{dest},
+      }) or $app->warn("Rsync failed for $source -> $dest: $!");
+
+  } while @ARGV;
+
+My personal version of the above script uses strict and warnings,
+and includes a complete manpage in POD. The POD takes up 246 lines,
+while the body of the script contains only 67 lines of code (again
+according to C<sloccount>). In other words, 80% of the script is
+documentation.
+
+C<CLI::Startup> saved a ton of effort writing this, by abstracting
+away the boilerplate code for making the script behave like a normal
+command-line utility. It consists of approximately 425 lines of
+code (C<sloccount> again), so the same script without C<CLI::Startup>
+would have been more than seven times longer, and would either have
+taken many extra hours to write, or else would lack the features
+that this version supports.
 
 =head1 EXPORT
 
 If you really don't like object-oriented coding, or your needs are
-super-simple, C<CLI::Startup> exports a single sub: C<startup()>.
+super-simple, C<CLI::Startup> optionally exports a single sub:
+C<startup()>.
 
 =head2 startup
 
-  my %opts = startup({
+  use CLI::Startup 'startup';
+
+  my $options = startup({
     'opt1=s' => 'Option taking a string',
     'opt2:i' => 'Optional option taking an integer',
     ...
@@ -205,7 +291,7 @@ my %initialized_of :ATTR( :get<initialized> );
 
 =head2 get_options
 
-  my %options = $app->get_options;
+  my $options = $app->get_options;
 
 Read-only: the command options for the current invocation of the
 script. This includes the actual command-line options of the script,
@@ -911,7 +997,7 @@ sub warn
     my $msg  = shift;
     my $name = basename($0);
 
-    warn "$name: WARNING: $msg\n";
+    CORE::warn "$name: WARNING: $msg\n";
 }
 
 =head2 write_rcfile

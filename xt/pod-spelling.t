@@ -16,6 +16,15 @@ __DATA__
 ACKNOWLEDGEMENTS
 AnnoCPAN
 Budney
+commalist
 CPAN
+CSV
+fourish
 GPL
-QFX
+INI
+init
+postpend
+rc
+rcfile
+startup
+unflattening

@@ -41,10 +41,11 @@ my $builder = $class->new(
         'Clone'          => 0,
         'Config::Simple' => '4.58',
         'File::Basename' => 0,
+        'File::HomeDir'  => '0.97',
         'Getopt::Long'   => '2.38',
         'Hash::Merge'    => 0,
         'List::Util'     => 0,
-        'Pod::Text'      => 0,
+        'Pod::Text'      => '3.01',
         'Text::CSV'      => 0,
     },
 

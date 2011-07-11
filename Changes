@@ -1,5 +1,7 @@
 Revision history for CLI-Startup
 
+0.04    2011-07-10
+        Replaced $HOME with platform-independent File::HomeDir.
 0.03    2011-07-09
         Fix documentation and one failed test.
 0.02    2011-07-08

@@ -8,6 +8,7 @@ use Pod::Text;
 use Text::CSV;
 use Class::Std;
 use Getopt::Long;
+use File::HomeDir;
 use Config::Simple;
 use File::Basename;
 use Clone qw{ clone };
@@ -24,11 +25,11 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 DESCRIPTION
 
@@ -917,7 +918,7 @@ sub BUILD {
     $self->set_rcfile(
           exists $argref->{rcfile}
         ? $argref->{rcfile}
-        : "$ENV{HOME}/." . basename($0) . "rc"
+        : File::HomeDir->my_data . "/." . basename($0) . "rc"
     );
 
     # Caller can forbid writing of rcfiles by setting

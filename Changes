@@ -1,5 +1,8 @@
 Revision history for CLI-Startup
 
+0.05    2011-08-20
+        Added workaround for instability in File::HomeDir. Grumble. See:
+        http://www.dagolden.com/index.php/1238/upgrading-filehomedir-might-lose-your-config-files/
 0.04    2011-07-10
         Replaced $HOME with platform-independent File::HomeDir.
 0.03    2011-07-09

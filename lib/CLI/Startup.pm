@@ -25,11 +25,11 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 DESCRIPTION
 
@@ -918,7 +918,7 @@ sub BUILD {
     $self->set_rcfile(
           exists $argref->{rcfile}
         ? $argref->{rcfile}
-        : File::HomeDir->my_data . "/." . basename($0) . "rc"
+        : File::HomeDir->my_home . "/." . basename($0) . "rc"
     );
 
     # Caller can forbid writing of rcfiles by setting

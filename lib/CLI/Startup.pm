@@ -25,11 +25,11 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 DESCRIPTION
 
@@ -72,7 +72,7 @@ methods that prepend the name of the script and postpend a newline.
     my $app = CLI::Startup->new({
         'infile=s'   => 'An option for specifying an input file',
         'outfile=s'  => 'An option for specifying an output file',
-        'password=s" => 'A password to use for something',
+        'password=s' => 'A password to use for something',
         'email=s@'   => 'Some email addresses to notify of something',
         'verbose'    => 'Verbose output flag',
         'lines:i'    => 'Optional - the number of lines to process',

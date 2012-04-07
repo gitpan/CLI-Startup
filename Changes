@@ -1,5 +1,7 @@
 Revision history for CLI-Startup
 
+0.06    2012-04-07
+        Fixed a small typo in the POD example code. TNX Tim Heaney.
 0.05    2011-08-20
         Added workaround for instability in File::HomeDir. Grumble. See:
         http://www.dagolden.com/index.php/1238/upgrading-filehomedir-might-lose-your-config-files/

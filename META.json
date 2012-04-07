@@ -4,7 +4,7 @@
       "Len Budney <len.budney@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120530",
    "license" : [
       "perl_5"
    ],
@@ -16,9 +16,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Exception" : 0,
-            "Test::More" : 0,
-            "Test::Trap" : 0
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Trap" : "0"
          }
       },
       "configure" : {
@@ -29,15 +29,15 @@
       "runtime" : {
          "requires" : {
             "Class::Std" : "0.01",
-            "Clone" : 0,
+            "Clone" : "0",
             "Config::Simple" : "4.58",
-            "File::Basename" : 0,
+            "File::Basename" : "0",
             "File::HomeDir" : "0.97",
             "Getopt::Long" : "2.38",
-            "Hash::Merge" : 0,
-            "List::Util" : 0,
+            "Hash::Merge" : "0",
+            "List::Util" : "0",
             "Pod::Text" : "3.01",
-            "Text::CSV" : 0,
+            "Text::CSV" : "0",
             "perl" : "v5.8.8"
          }
       }
@@ -45,7 +45,7 @@
    "provides" : {
       "CLI::Startup" : {
          "file" : "lib/CLI/Startup.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -54,5 +54,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05"
+   "version" : "0.06"
 }

@@ -10,6 +10,7 @@ README
 t/00-load.t
 t/api.t
 t/getopts.t
+t/help.t
 t/init.t
 t/manpage.t
 t/nomanpage.t

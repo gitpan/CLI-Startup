@@ -25,11 +25,11 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 DESCRIPTION
 
@@ -527,8 +527,7 @@ sub die_usage
     $self->die("die_usage() called without defining any options")
         unless keys %$optspec;
 
-    # Keep only the options that are actually used, and
-    # sort them in dictionary order.
+    # Keep only the options that are actually used.
     my %options =
         map { ( $_->{names}[0], $_ ) }
         map { $self->_parse_spec($_) }
@@ -541,7 +540,8 @@ sub die_usage
     print "usage: " . basename($0) . " " . $self->get_usage . "\n";
     print "Options:\n";
 
-    for my $option (keys %options)
+    # Print the options, sorted in dictionary order.
+    for my $option (sort keys %options)
     {
         my $indent = $length + 6;
         my $spec   = $options{$option};

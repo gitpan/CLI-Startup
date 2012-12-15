@@ -1,6 +1,7 @@
 Build.PL
 Changes
 Debian_CPANTS.txt
+examples/rs
 lib/CLI/Startup.pm
 Makefile.PL
 MANIFEST

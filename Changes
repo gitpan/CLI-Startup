@@ -1,8 +1,10 @@
 Revision history for CLI-Startup
 
-0.10    2014-05-19
+0.11    2014-05-19
+        Added implicit dependencies missing from the Build.PL.
+0.10    2014-05-18
         Improved config file processing to avoid corrupting non-config data in the file.
-0.09    2014-05-18
+0.09    2014-05-17
         Switched from Config::Simple to Config::Any to add JSON, YAML, XML, and Perl support.
         Added --rcfile-format option to allow any of the above formats to be specified.
         Fixed a bug where some attributes were returned by reference instead of by copy.

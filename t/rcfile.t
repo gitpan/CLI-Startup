@@ -325,7 +325,10 @@ close RC or die "Couldn't write $rcfile: $!";
 }
 
 # Read a more complicated RC file in YAML syntax
-{
+SKIP: {
+    eval "use YAML::Any";
+    skip("YAML::Any is not installed", 1) if $@;
+
     # Create the file
     open OUT, ">", $rcfile;
     print OUT <<EOF;

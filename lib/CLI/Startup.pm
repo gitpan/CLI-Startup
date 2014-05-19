@@ -21,7 +21,7 @@ use List::Util qw{ max reduce };
 use base 'Exporter';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Simple command-line processing with transparent
 # support for config files.
@@ -530,37 +530,55 @@ sub _read_config_file
         $raw_config = {};
     }
 
+    # Initialize an empty config
     my $config = { default => {} };
+
+    # Copy in the default section, if there is one.
+    if ( defined $raw_config->{default} )
+    {
+        if ( ref $raw_config->{default} ne 'HASH' )
+        {
+            $self->die("Config file's \"default\" setting isn't a hash!");
+        }
+        else
+        {
+            $config->{default} = delete $raw_config->{default};
+        }
+    }
 
     # Now parse strings if they're supposed to be hashes or arrays.
     # This is basically a fix for file formats like INI, that can't
     # encode data structures.
 
-    # Now, in case the config file has sections, unflatten the hash.
+    # Step through the config, moving any scalars we see into the
+    # default section.
     for my $key ( keys %{$raw_config} )
     {
-        # We expect a two-level hash, with a "default" section,
-        # but if there isn't one, or there are naked options,
-        # then we treat them as defaults.
-        if ( ref $raw_config->{$key} ne 'HASH' )
+        # We expect a hash, with a "default" section, but if there
+        # isn't one, or there are naked options, then we treat them
+        # as defaults.
+        if ( not ref $raw_config->{$key} )
         {
-            $config->{default}{$key}
-                = $self->_parse_setting( $raw_config->{$key}, $key, $types );
+            $config->{default}{$key} = delete $raw_config->{$key};
             next;
         }
-
-        # Since this is a hashref, step through ITS keys, fixing them
-        # up.
-        for my $option ( keys %{ $raw_config->{$key} } )
+        else
         {
-            my $value = $raw_config->{$key}{$option};
-            $value    = $self->_parse_setting( $value, $option, $types );
-
-            $config->{$key}{$option} = $value;
+            $config->{$key} = delete $raw_config->{$key};
         }
     }
 
-    # Save the unflattened config for reference
+    # Now step through the default section, turning scalars into
+    # arrays and hashes as necessary.
+    for my $option ( keys %{ $config->{default} } )
+    {
+        my $value = $config->{default}{$option};
+        $value    = $self->_parse_setting( $value, $option, $types );
+
+        $config->{default}{$option} = $value;
+    }
+
+    # Save the cleaned-up config for reference
     $config_of{ident $self} = $config;
 
     return $config;
@@ -939,7 +957,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

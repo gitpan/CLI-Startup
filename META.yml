@@ -31,4 +31,4 @@ requires:
   Test::More: '0'
   Test::Trap: '0'
   Text::CSV: '0'
-version: '0.09'
+version: '0.10'

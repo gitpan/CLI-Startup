@@ -33,10 +33,6 @@ throws_ok { $app->set_write_rcfile(1) } qr/requires a coderef/,
     "set_write_rcfile() requires a coderef";
 throws_ok { $app->set_optspec } qr/requires a hashref/,
     "set_optspec() requires a hashref";
-throws_ok { $app->set_optspec({}) } qr/No.*options defined/,
-    "set_optspec() requires at least one non-default option";
-throws_ok { $app->set_optspec({ help => 1 }) } qr/No.*options defined/,
-    "set_optspec() requires at least one non-default option";
 throws_ok { $app->set_default_settings    } qr/requires a hashref/,
     "set_default_settings() requires an argument";
 throws_ok { $app->set_default_settings(1) } qr/requires a hashref/,

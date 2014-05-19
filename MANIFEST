@@ -17,6 +17,7 @@ t/manpage.t
 t/nomanpage.t
 t/perl-fourish.t
 t/rcfile.t
+t/write_rcfile.t
 xt/boilerplate.t
 xt/cover.t
 xt/distribution.t

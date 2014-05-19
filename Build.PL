@@ -39,7 +39,7 @@ my $builder = $class->new(
         perl             => '5.8.8',
         'Class::Std'     => '0.01',
         'Clone'          => 0,
-        'Config::Simple' => '4.58',
+        'Config::Any'    => 0,
         'File::Basename' => 0,
         'File::HomeDir'  => '0.97',
         'Getopt::Long'   => '2.38',
@@ -47,6 +47,13 @@ my $builder = $class->new(
         'List::Util'     => 0,
         'Pod::Text'      => '3.01',
         'Text::CSV'      => 0,
+    },
+
+    recommends => {
+        'JSON::Any'           => 0,
+        'YAML::Any'           => 0,
+        'XML::Simple'         => 0,
+        'Config::INI::Writer' => 0,
     },
 
     build_requires => {

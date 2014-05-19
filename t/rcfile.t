@@ -23,11 +23,12 @@ print RC <<EOF;
 [default]
 foo=1
 bar=baz
+baz=0
 
 [extras]
 a=1
 b=2
-c=3, 4, 5
+c=3, 4, 5 ; This will NOT be split into an array!
 EOF
 close RC or die "Couldn't write $rcfile: $!";
 
@@ -42,21 +43,25 @@ close RC or die "Couldn't write $rcfile: $!";
     # Create a CLI::Startup object and read the rc file
     my $app = CLI::Startup->new( {
         rcfile  => $rcfile,
-        options => { foo => 'bar' },
+        options => {
+            foo     => 'stuff',
+            'bar=s' => 'more stuff',
+            'baz!'  => 'negatable stuff',
+        },
     } );
     $app->init;
 
     # Config file contents are stored now
     is_deeply $app->get_config,
         {
-            default => { foo => 1, bar => 'baz' },
-            extras  => { a => 1, b => 2, c => [qw/3 4 5/], }
+            default => { foo => 1, bar => 'baz', baz => 0 },
+            extras  => { a => 1, b => 2, c => '3, 4, 5', }
         },
         "Config file contents";
 
     # The "default" section of the config file is copied
     # into the command-line options
-    is_deeply $app->get_options, { foo => 1, bar => 'baz' },
+    is_deeply $app->get_options, { foo => 1, bar => 'baz', baz => 0 },
         "Command options contents";
     is_deeply $app->get_raw_options, {}, "No command-line options";
 
@@ -109,9 +114,7 @@ close RC or die "Couldn't write $rcfile: $!";
     });
     lives_ok { $app->init } "Init with nonexistent command-line rcfile";
     ok $app->get_rcfile eq "$file", "rcfile set correctly";
-    is_deeply $app->get_config, {
-        default => { foo=>1, bar=>'baz' }
-    }, "Config is empty";
+    is_deeply $app->get_config, { default => {} }, "Config is initially empty.";
     ok -r "$file", "File was created";
 
     my $app2 = CLI::Startup->new({
@@ -119,7 +122,8 @@ close RC or die "Couldn't write $rcfile: $!";
         options => { foo => 'bar' },
     });
     $app2->init;
-    is_deeply $app2->get_config, $app->get_config, "Writeback is idempotent";
+    is_deeply $app2->get_config, { default => { foo => 1, bar => 'baz' }},
+        "Writeback is idempotent";
 }
 
 # Specify a config file in the constructor, then change it, and
@@ -215,61 +219,8 @@ close RC or die "Couldn't write $rcfile: $!";
     like $trap->die, qr/but called anyway/, "Correct error message";
 }
 
-# Read three different types of RC file
+# Read various different types of RC file
 {
-    open OUT, ">", $rcfile;
-    print OUT <<EOF;
-foo=bar
-bar=baz
-EOF
-    close OUT;
-
-    my $app1 = CLI::Startup->new({
-        rcfile  => $rcfile,
-        options => { a => 1 },
-    });
-    $app1->init;
-
-    open OUT, ">", $rcfile;
-    print OUT <<EOF;
-foo bar
-bar baz
-EOF
-    close OUT;
-
-    my $app2 = CLI::Startup->new({
-        rcfile  => $rcfile,
-        options => { a => 1 },
-    });
-    $app2->init;
-
-    open OUT, ">", $rcfile;
-    print OUT <<EOF;
-[default]
-foo=bar
-bar=baz
-EOF
-    close OUT;
-
-    my $app3 = CLI::Startup->new({
-        rcfile  => $rcfile,
-        options => { a => 1 },
-    });
-    $app3->init;
-
-    open OUT, ">", $rcfile;
-    print OUT <<EOF;
-foo: bar
-bar: baz
-EOF
-    close OUT;
-
-    my $app4 = CLI::Startup->new({
-        rcfile  => $rcfile,
-        options => { a => 1 },
-    });
-    $app4->init;
-
     # This is what the configs should all match.
     my $config = {
         default => {
@@ -278,10 +229,136 @@ EOF
         },
     };
 
-    is_deeply $app1->get_config, $config,           "Simple ini matches";
-    is_deeply $app1->get_config, $app2->get_config, "Simple matches simple ini";
-    is_deeply $app1->get_config, $app3->get_config, "Ini matches simple ini";
-    is_deeply $app1->get_config, $app4->get_config, "HTTP matches simple ini";
+    # First: Bare name/value pairs
+    open OUT, ">", $rcfile;
+    print OUT "foo=bar\nbar=baz\n";
+    close OUT;
+
+    my $app1 = CLI::Startup->new({
+        rcfile  => $rcfile,
+        options => { a => 1 },
+    });
+    $app1->init;
+
+    is_deeply $app1->get_config, $config, "Simple config matches";
+
+    SKIP: {
+        eval "use YAML::Any";
+        skip("YAML::Any is not installed", 1) if $@;
+
+        # Next, if available: YAML config
+        open OUT, ">", $rcfile;
+        print OUT "---\ndefault:\n  foo: bar\n  bar: baz\n";
+        close OUT;
+
+        my $app2 = CLI::Startup->new({
+            rcfile  => $rcfile,
+            options => { a => 1 },
+        });
+        $app2->init;
+
+        is_deeply $app2->get_config, $config, "YAML matches simple config";
+    }
+
+
+    # INI-style file
+    open OUT, ">", $rcfile;
+    print OUT "[default]\nfoo=bar\nbar=baz\n";
+    close OUT;
+
+    my $app3 = CLI::Startup->new({
+        rcfile  => $rcfile,
+        options => { a => 1 },
+    });
+    $app3->init;
+
+    is_deeply $app3->get_config, $config, "INI file matches simple config";
+
+    # Naked colon-separated values
+    open OUT, ">", $rcfile;
+    print OUT "foo: bar\nbar: baz\n";
+    close OUT;
+
+    my $app4 = CLI::Startup->new({
+        rcfile  => $rcfile,
+        options => { a => 1 },
+    });
+    $app4->init;
+
+    is_deeply $app4->get_config, $config, "Simple colons matches simple config";
+
+    SKIP: {
+        eval "use JSON::Any";
+        skip("JSON::Any is not installed", 1) if $@;
+
+        # JSON config file
+        open OUT, ">", $rcfile;
+        print OUT qq{{\n    "default": {\n        "bar":"baz",\n        "foo":"bar"\n}\n}};
+        close OUT;
+
+        my $app5 = CLI::Startup->new({
+            rcfile  => $rcfile,
+            options => { a => 1 },
+        });
+        $app5->init;
+
+        is_deeply $app5->get_config, $config, "JSON matches simple config";
+    }
+
+    SKIP: {
+        eval "use XML::Simple";
+        skip("XML::Simple is not installed", 1) if $@;
+
+        # XML config file
+        open OUT, ">", $rcfile;
+        print OUT "<opt>\n  <default bar=\"baz\" foo=\"bar\" />\n</opt>\n";
+        close OUT;
+
+        my $app6 = CLI::Startup->new({
+            rcfile  => $rcfile,
+            options => { a => 1 },
+        });
+        $app6->init;
+
+        is_deeply $app6->get_config, $config, "XML matches simple config";
+    }
+}
+
+# Read a more complicated RC file in YAML syntax
+{
+    # Create the file
+    open OUT, ">", $rcfile;
+    print OUT <<EOF;
+---
+default:
+  foo: bar
+  bar: baz
+  baz: [ 1, 2, 3 ]
+  qux: { a: 1, b: 2, c: 3 }
+EOF
+    close OUT;
+
+    my $app = CLI::Startup->new({
+        rcfile  => $rcfile,
+        options => {
+            'foo=s'  => 1,
+            'bar=s'  => 1,
+            'baz=i@' => 1,
+            'qux=s%' => 1,
+        },
+    });
+    $app->init;
+
+    my $config = {
+        default => {
+            foo => 'bar',
+            bar => 'baz',
+            baz => [ 1, 2, 3 ],
+            qux => { a => 1, b => 2, c => 3 },
+        }
+    };
+
+    is_deeply $app->get_config, $config, "More complicated YAML config";
 }
 
 # Command-line overrides contents of rcfile
@@ -297,7 +374,7 @@ EOF
         rcfile  => $rcfile,
         options => { 'foo=s' => 'foo', 'bar=s' => 'bar' },
     });
-    
+
     local @ARGV = ('--foo=baz');
     $app->init;
     ok $app->get_options->{foo} eq 'baz', "Options override rcfile";

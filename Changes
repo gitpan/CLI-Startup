@@ -1,5 +1,11 @@
 Revision history for CLI-Startup
 
+0.09    2014-05-18
+        Switched from Config::Simple to Config::Any to add JSON, YAML, XML, and Perl support.
+        Added --rcfile-format option to allow any of the above formats to be specified.
+        Fixed a bug where some attributes were returned by reference instead of by copy.
+        Bunches of cleanup to fix perlcritic warnings, some legitimate bugs among them.
+        Moved POD to end of the file, making it easier to read.
 0.08    2012-12-15
         Added example script: rsync wrapper similar to manpage example, but robuster.
 0.07    2012-09-23

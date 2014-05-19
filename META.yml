@@ -1,36 +1,34 @@
 ---
-abstract: 'Simple initialization for command-line scripts'
+abstract: unknown
 author:
-  - 'Len Budney <len.budney@gmail.com>'
+  - unknown
 build_requires:
-  Test::Exception: 0
-  Test::More: 0
-  Test::Trap: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: 0.33
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.140640'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CLI-Startup
-provides:
-  CLI::Startup:
-    file: lib/CLI/Startup.pm
-    version: 0.08
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Class::Std: 0.01
-  Clone: 0
-  Config::Simple: 4.58
-  File::Basename: 0
-  File::HomeDir: 0.97
-  Getopt::Long: 2.38
-  Hash::Merge: 0
-  List::Util: 0
-  Pod::Text: 3.01
-  Text::CSV: 0
-  perl: v5.8.8
-resources:
-  license: http://dev.perl.org/licenses/
-version: 0.08
+  Class::Std: '0.01'
+  Clone: '0'
+  Config::Any: '0'
+  File::Basename: '0'
+  File::HomeDir: '0.97'
+  Getopt::Long: '2.38'
+  Hash::Merge: '0'
+  List::Util: '0'
+  Pod::Text: '3.01'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Trap: '0'
+  Text::CSV: '0'
+version: '0.09'

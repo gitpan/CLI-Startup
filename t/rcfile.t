@@ -274,19 +274,6 @@ close RC or die "Couldn't write $rcfile: $!";
 
     is_deeply $app3->get_config, $config, "INI file matches simple config";
 
-    # Naked colon-separated values
-    open OUT, ">", $rcfile;
-    print OUT "foo: bar\nbar: baz\n";
-    close OUT;
-
-    my $app4 = CLI::Startup->new({
-        rcfile  => $rcfile,
-        options => { a => 1 },
-    });
-    $app4->init;
-
-    is_deeply $app4->get_config, $config, "Simple colons matches simple config";
-
     SKIP: {
         eval "use JSON::Any";
         skip("JSON::Any is not installed", 1) if $@;

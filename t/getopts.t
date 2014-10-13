@@ -10,7 +10,7 @@ no warnings 'qw';
 
 # Test list-y options
 {
-    local @ARGV = qw/ --x=a,b -x=c -x="d,1" -x "e,2","f,3",g /;
+    local @ARGV = qw/ --x=a,b --x=c --x="d,1" --x "e,2","f,3",g /;
     my $options = startup({ 'x=s@' => 'listy x option' });
     is_deeply $options->{x},
         [qw/a b c d,1 e,2 f,3 g/],
@@ -19,7 +19,7 @@ no warnings 'qw';
 
 # Test hash-y options
 {
-    local @ARGV = qw/ --x=a=1 -x b=2 -x c=3=2+1 /;
+    local @ARGV = qw/ --x=a=1 --x b=2 --x c=3=2+1 /;
     my $options = startup({ 'x=s%' => 'hashy x option' });
     is_deeply $options->{x},
         { a => 1, b => 2, c => '3=2+1' },

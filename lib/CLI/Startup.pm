@@ -11,17 +11,17 @@ use Text::CSV;
 use Class::Std;
 use Config::Any;
 use Data::Dumper;
-use Getopt::Long;
 use File::HomeDir;
 use File::Basename;
 use Clone qw{ clone };
 use Hash::Merge qw{ merge };
 use List::Util qw{ max reduce };
+use Getopt::Long qw{ :config posix_default gnu_compat bundling };
 
 use base 'Exporter';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # Simple command-line processing with transparent
 # support for config files.
@@ -244,7 +244,7 @@ sub die_usage
 sub _get_default_optspec
 {
     return {
-        'help'            => 'Print this helpful help message',
+        'help|?'          => 'Print this helpful help message',
         'rcfile=s'        => 'Config file to load',
         'write-rcfile'    => 'Write current options to rcfile',
         'rcfile-format=s' => 'Format to write the rcfile',
@@ -691,6 +691,13 @@ sub BUILD
     return;
 }
 
+# Destructor. Nothing much to do, but without it we get
+# a warning about CLI::Startup::DEMOLISH only being used
+# once by Class::Std.
+sub DEMOLISH
+{
+}
+
 # Prints out the POD contained in the script file, if any.
 sub print_manpage
 {
@@ -742,7 +749,7 @@ sub write_rcfile
         unless $self->get_initialized;
 
     # If there's no file to write, abort.
-    $self->die('Write rcfile: no file specified') unless $file;
+    $self->die("can't write rcfile: no file specified") unless $file;
 
     # Check whether a writer has been set
     my $writer = $self->_choose_rcfile_writer;
@@ -1101,6 +1108,61 @@ methods that prepend the name of the script and postpend a newline.
     $app->warn();           # Format warnings nicely
     $app->die();            # Die with a nicely-formatted message
 
+=head1 COMMAND LINE PROCESSING
+
+C<CLI::Startup> ultimately calls C<Getopt::Long::GetOptions()>, so
+processing works almost exactly like you're used to. The only major
+difference is in the handling of array and hash argument types.
+
+When the option spec is something like 'email=s@', that means the
+C<--email> option can be specified multiple times. The arguments are
+then collected in an array, so C<$app->get_options->{email}> will
+be an array reference. I<In addition>, though, C<CLI::Startup> will
+step through each of the arguments and parse them as CSV. As a result,
+the following are equivalent:
+
+  foo --bar=baz --bar=qux --bar=quux
+  foo --bar=baz,qux --bar=quux
+  foo --bar=baz,qux,quux
+
+Similarly, when the option spec is something like 'map=s%', that
+means that the C<--map> option is hash-valued, and
+C<$app->get_options->{map}> will be a hash reference. The name/value
+pairs are delimited by an equals sign, and either separated by commas
+or given in separate repetitions of the option, like so:
+
+  foo --bar=baz=1 --bar=qux=2
+  foo --bar=baz=1,qux=2
+  # etc...
+
+If you're running the C<foo> script, in this case, you probably want to
+omit the equals sign between the option and its argument, to reduce
+confusion, like so:
+
+  foo --bar baz=1,qux=2
+
+Also note that C<Getopt::Long> is configured with the settings
+C<posix_default>, C<gnu_compat>, and C<bundling>.  That means most
+confusing options are turned off, like specifying options first,
+and their arguments in a big list at the end, or other things that
+you hopefully don't want to do anyway. Specifically,
+
+=over
+
+=item * Abbreviated versions of option names are not recognized.
+
+=item * Options can't be started with a '+' in lieu of '--'.
+
+=item * You I<can> use C<--opt=> to specify empty options.
+
+=item * Options must be immediately followed by their arguments.
+
+=item * Single-character options I<can> be combined: C<-las> for C<-l -a -s>.
+
+=item * Option names are case insensitive.
+
+=back
+
 =head1 EXAMPLES
 
 The following is a complete implementation of a wrapper for C<rsync>.
@@ -1188,10 +1250,20 @@ C<startup()>.
 
   use CLI::Startup 'startup';
 
+  # Simple version--almost a drop-in replacement for
+  # Getopt::Long:
   my $options = startup({
     'opt1=s' => 'Option taking a string',
     'opt2:i' => 'Optional option taking an integer',
     ...
+  });
+
+  # More complicated version, using more CLI::Startup
+  # features.
+  my $options = startup({
+      usage            => '[options] [module ...]',
+      options          => $optspec,
+      default_settings => $defaults,
   });
 
 Process command-line options specified in the argument hashref.
@@ -1290,7 +1362,7 @@ and see C<Getopt::Long> for the full syntax.
   });
 
 Set the hash of command-line options. The keys use C<Getopt::Long>
-syntax, and the values are descriptions for printing in the usage
+syntax, and the values are descriptions, to be printed in the usage
 message.
 
 It is a fatal error to call C<set_optspec()> after calling C<init()>.
@@ -1395,6 +1467,10 @@ reading config files created some other way.
 =head2 BUILD
 
 An internal method called by C<new()>.
+
+=head2 DEMOLISH
+
+An internal method, called when an object goes out of scope.
 
 =head2 init
 

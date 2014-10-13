@@ -179,8 +179,8 @@ close RC or die "Couldn't write $rcfile: $!";
     local @ARGV = ('--rcfile=', '--write-rcfile');
     trap { $app->init() };
 
-    ok $trap->exit == 1, "Error exit trying to write file";
-    like $trap->stderr, qr/rcfile requires an argument/, "Correct error message";
+    ok $trap->leaveby eq 'die', "Error exit trying to write file";
+    like $trap->die, qr/no file specified/, "Correct error message";
 }
 
 # Specify a custom rcfile writer

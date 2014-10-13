@@ -1,5 +1,10 @@
 Revision history for CLI-Startup
 
+0.13    2014-10-13
+        Added explicit destructor, to turn off a Class:Std warning.
+        Added documentation to the man page.
+        Set explicit configs for Getopt::Long that are saner than the defaults.
+        Added -? as an alias for --help.
 0.12    2014-05-20
         Removed support for colon-based format for config files.
 0.11    2014-05-19

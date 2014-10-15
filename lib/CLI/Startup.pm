@@ -21,7 +21,7 @@ use Getopt::Long qw{ :config posix_default gnu_compat bundling };
 use base 'Exporter';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14'; # Don't forget to update the manpage version, too!
 
 # Simple command-line processing with transparent
 # support for config files.
@@ -204,7 +204,7 @@ sub die_usage
         keys %{$optspec};
 
     # Note the length of the longest option
-    my $length  = max map { length($_) } keys %options;
+    my $length  = max map { length() } keys %options;
 
     # Now print the help message.
     print 'usage: ' . basename($PROGRAM_NAME) . ' ' . $self->get_usage . "\n";
@@ -529,8 +529,8 @@ sub _read_config_file
             for my $arg (@args)
             {
                 next if ref $arg;
-                return if $arg =~ /Unable to recognise encoding/;
-                return if $arg =~ /ParserDetails\.ini/;
+                return if $arg =~ /Unable to recognise encoding/xms;
+                return if $arg =~ /ParserDetails[.]ini/xms;
             }
 
             CORE::warn(@args);
@@ -554,7 +554,7 @@ sub _read_config_file
     {
         if ( ref $raw_config->{default} ne 'HASH' )
         {
-            $self->die("Config file's \"default\" setting isn't a hash!");
+            $self->die('Config file\'s "default" setting isn\'t a hash!');
         }
         else
         {
@@ -749,7 +749,7 @@ sub write_rcfile
         unless $self->get_initialized;
 
     # If there's no file to write, abort.
-    $self->die("can't write rcfile: no file specified") unless $file;
+    $self->die('can\'t write rcfile: no file specified') unless $file;
 
     # Check whether a writer has been set
     my $writer = $self->_choose_rcfile_writer;
@@ -980,7 +980,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =head1 SYNOPSIS
 

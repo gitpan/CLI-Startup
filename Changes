@@ -1,5 +1,7 @@
 Revision history for CLI-Startup
 
+0.14    2014-10-15
+        Cleaned up some test code and fixed some failed tests.
 0.13    2014-10-13
         Added explicit destructor, to turn off a Class:Std warning.
         Added documentation to the man page.

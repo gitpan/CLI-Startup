@@ -1,5 +1,8 @@
 Revision history for CLI-Startup
 
+0.16    2014-10-17
+        Removed alias --? for --help due to subtle bug.
+        TODO: Add support for users to add aliases for --help.
 0.15    2014-10-16
         Fixed tests that break when Config::Tiny isn't installed.
         Changed write_rcfile() to exit automatically.

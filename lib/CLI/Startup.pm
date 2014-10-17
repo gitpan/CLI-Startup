@@ -21,7 +21,7 @@ use Getopt::Long qw{ :config posix_default gnu_compat bundling };
 use base 'Exporter';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.15'; # Don't forget to update the manpage version, too!
+our $VERSION = '0.16'; # Don't forget to update the manpage version, too!
 
 # Simple command-line processing with transparent
 # support for config files.
@@ -244,7 +244,7 @@ sub die_usage
 sub _get_default_optspec
 {
     return {
-        'help|?'          => 'Print this helpful help message',
+        'help'            => 'Print this helpful help message',
         'rcfile=s'        => 'Config file to load',
         'write-rcfile'    => 'Write current options to rcfile',
         'rcfile-format=s' => 'Format to write the rcfile',
@@ -980,7 +980,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -1584,10 +1584,15 @@ Len Budney, C<< <len.budney at gmail.com> >>
 
 C<CLI::Startup> tries reasonably to keep things consistent, but it
 doesn't stop you from shooting yourself in the foot if you try at
-all hard. For example, it doesn't confirm that your default options
-actually correspond to your option specifications: it will ignore
-defaults for nonexistent options, and cheerfully let you assign a
-hashref as the default value of a boolean option, etc.
+all hard. For example: it will let you specify defaults for
+nonexistent options; it will let you use a hashref as the default
+value for a boolean option; etc..
+
+For now, you should also not define aliases for default options.
+If you try to define an option like 'help|?', expecting to get
+C<--help> and C<--?> as synonyms, something will break. Basically,
+C<CLI::Startup> isn't quite smart enough to recognize that your
+help option is a suitable replacement for the builtin one.
 
 Please report any bugs or feature requests to C<bug-cli-startup at
 rt.cpan.org>, or through the web interface at

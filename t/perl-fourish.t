@@ -61,16 +61,25 @@ our $VERSION = 3.1415;
     trap { startup({ foo => 'foo option' }) };
 
     ok $trap->exit == 1, "Correct exit status on --help option";
-    like $trap->stdout, qr/usage:/, "Usage message printed";
+    like $trap->stdout, qr/usage:/, "Regular usage message printed";
 }
 
-# --help option with custom help text and usage
+# --help option with custom help text
 {
     local @ARGV = ('--help');
     trap { startup({ help => 'custom help', foo => 'bar' })};
 
     ok $trap->exit == 1, "Correct exit status on --help";
     like $trap->stdout, qr/custom help/, "Custom help message printed";
+}
+
+# --help option can't be turned off
+{
+    local @ARGV = ('--help');
+    trap { startup({ 'help' => 0, foo => 'bar' })};
+
+    like $trap->stdout, qr/usage:/, "Can't disable --help option";
+    ok $trap->exit == 1, "...and the exit status is correct";
 }
 
 # --rcfile option with rcfile disabled

@@ -52,7 +52,7 @@
    "provides" : {
       "CLI::Startup" : {
          "file" : "lib/CLI/Startup.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -61,5 +61,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.15"
+   "version" : "0.16"
 }

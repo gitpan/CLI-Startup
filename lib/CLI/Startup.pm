@@ -21,7 +21,7 @@ use Getopt::Long qw{ :config posix_default gnu_compat bundling };
 use base 'Exporter';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.14'; # Don't forget to update the manpage version, too!
+our $VERSION = '0.15'; # Don't forget to update the manpage version, too!
 
 # Simple command-line processing with transparent
 # support for config files.
@@ -529,7 +529,7 @@ sub _read_config_file
             for my $arg (@args)
             {
                 next if ref $arg;
-                return if $arg =~ /Unable to recognise encoding/xms;
+                return if $arg =~ /Unable to recognise encoding/ms;
                 return if $arg =~ /ParserDetails[.]ini/xms;
             }
 
@@ -764,7 +764,7 @@ sub write_rcfile
         $self->die('write_rcfile() disabled, but called anyway');
     }
 
-    return;
+    exit 0;
 }
 
 # Returns a hashref that looks like a config file's contents, with
@@ -980,7 +980,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =head1 SYNOPSIS
 

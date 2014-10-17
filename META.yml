@@ -18,9 +18,10 @@ name: CLI-Startup
 provides:
   CLI::Startup:
     file: lib/CLI/Startup.pm
-    version: '0.14'
+    version: '0.15'
 recommends:
   Config::INI::Writer: '0'
+  Config::Tiny: '0'
   JSON::Any: '0'
   XML::Simple: '0'
   YAML::Any: '0'
@@ -38,4 +39,4 @@ requires:
   perl: v5.8.8
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.14'
+version: '0.15'

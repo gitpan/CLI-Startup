@@ -50,10 +50,11 @@ my $builder = $class->new(
     },
 
     recommends => {
-        'JSON::Any'           => 0,
-        'YAML::Any'           => 0,
-        'XML::Simple'         => 0,
-        'Config::INI::Writer' => 0,
+        'Config::Tiny'        => 0, # To read INI configs
+        'Config::INI::Writer' => 0, # To write INI configs
+        'JSON::Any'           => 0, # To write JSON configs
+        'YAML::Any'           => 0, # To write YAML configs
+        'XML::Simple'         => 0, # To write XML configs
     },
 
     build_requires => {

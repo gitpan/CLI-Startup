@@ -1,5 +1,8 @@
 Revision history for CLI-Startup
 
+0.15    2014-10-16
+        Fixed tests that break when Config::Tiny isn't installed.
+        Changed write_rcfile() to exit automatically.
 0.14    2014-10-15
         Cleaned up some test code and fixed some failed tests.
 0.13    2014-10-13
